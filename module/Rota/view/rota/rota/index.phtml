@@ -1,0 +1,47 @@
+<?php
+// module/Album/view/album/album/index.phtml:
+
+$title = 'This Month Rota';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+
+<table class="table">
+
+<?php
+$d1 = new DateTime();
+$d1->setTimestamp(strtotime('last Sunday'));
+$d2 = clone $d1;
+$d2->modify('+6 days');
+$inc = new DateInterval('P1D'); // one day 
+$per = new DatePeriod($d1, $inc, 28);
+foreach ($per as $d) {
+    $blank_array[$d->format('Y-m-d')] = 0;
+    $headings[] = $d->format('D jS');
+}
+$output = "<tr><th>User</th><th>" . join('</th><th>', $headings) . "</th></tr>\n"; 
+
+
+$currUser = '';
+ foreach ($rotas as $rota) : 
+ {
+    if ($rota->name != $currUser) {
+        if ($currUser) {
+            $output .= "<tr><td>$currUser</td><td>" . join('</td><td>', $totals) . "</td></tr>\n";
+        }
+		
+        $currUser = $rota->name ;      
+        $totals = $blank_array;
+    }
+    $totals[$rota->date] = $rota->shift ;	  
+}   
+
+
+?>
+<?php endforeach;
+$output .= "<tr><td >$currUser</td><td >" . join('</td><td >', $totals) . "</td></tr>\n";
+  
+ echo $output;  ?>
+
+</table>
